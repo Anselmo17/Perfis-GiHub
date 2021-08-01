@@ -33,7 +33,8 @@ async function consultaData() {
         </td>
          <td>
            <div class="align-btn">
-            <button class="btn third">
+            <button class="btn third" 
+              onclick="findById('${item.login}')">
               Detalhes
             </button>
            </div>
@@ -42,4 +43,46 @@ async function consultaData() {
   });
   listTemplate += `</table>`;
   container.innerHTML = listTemplate;
+}
+
+async function findById(idLogin) {
+  const apiUserId = `https://api.github.com/users/${idLogin}`;
+  const result = await fetch(apiUserId);
+  const user = await result.json();
+  if (!user) {
+    alert("Nenhum usuario encontrado");
+    return;
+  }
+
+  const openModal = document.getElementById("openModal");
+
+  let userModal = "";
+  userModal += `
+   <div>
+    <div class="alignClose">
+      <a href="/" title="Close" class="close">X</a>
+    </div>
+		<h2>${user.login}</h2>
+		<p>Nome: ${user.name ? user.name : "-"}</p>
+		<p>Companhia: ${user.company ? user.company : "-"}</p>
+    <p>Localização: ${user.location ? user.location : "-"}</p>
+    <p>Ultima atualização: ${
+      user.updated_at ? formatDate(user.updated_at) : "-"
+    }</p>
+	</div>
+   `;
+
+  // carrega template modal
+  openModal.innerHTML = userModal;
+
+  // abrir modal
+  openModal.style.display = "block";
+  let urlBase = window.location.href.replace("#openModal", "");
+  window.location.href = urlBase + "#openModal";
+}
+
+function formatDate(date) {
+  let dateformated = new Date(date);
+  dateformated = dateformated.toLocaleDateString();
+  return dateformated;
 }
