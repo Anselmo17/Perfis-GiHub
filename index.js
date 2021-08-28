@@ -1,4 +1,4 @@
-  const gitHub = "https://api.github.com/users";
+const gitHub = "https://api.github.com/users";
 
 async function listaPerfis() {
   const result = await fetch(gitHub);
@@ -6,15 +6,15 @@ async function listaPerfis() {
   return response;
 }
 
-async function consultaData() {
-  const list = await listaPerfis();
-
+async function consultaData(userFiltered) {
+  let list = [];
+  userFiltered ? list.push(userFiltered) : (list = await listaPerfis());
   let listTemplate = `
   <table border="1px" cellpadding="5px" cellspacing="0" id="alter">
       <tr>
          <th scope="col">Nome</th>
-        <th scope="col">Foto do Perfil</th>
-        <th scope="col">Detalhes do Perfil</th>
+        <th scope="col">Foto</th>
+        <th scope="col">Informações do Perfil</th>
       </tr>
   `;
 
@@ -47,8 +47,8 @@ async function consultaData() {
 }
 
 async function findById(idLogin) {
-  const apiUserId = `${gitHub}/${idLogin}`;
-  const result = await fetch(apiUserId);
+  const resultUser = `${gitHub}/${idLogin}`;
+  const result = await fetch(resultUser);
   const user = await result.json();
   if (!user) {
     alert("Nenhum usuario encontrado");
@@ -80,6 +80,18 @@ async function findById(idLogin) {
   openModal.style.display = "block";
   let urlBase = window.location.href.replace("#openModal", "");
   window.location.href = urlBase + "#openModal";
+}
+
+async function pesquisa() {
+  const userFiltered = document.getElementById("search-user").value.toLowerCase();
+  if (userFiltered) {
+    const resultFilter = `${gitHub}/${userFiltered}`;
+    const userFilter = await fetch(resultFilter);
+    const resFilter = await userFilter.json();
+    consultaData(resFilter);
+    return;
+  }
+  consultaData();
 }
 
 function formatDate(date) {
