@@ -1,5 +1,6 @@
-async function listaPerfis() {
   const gitHub = "https://api.github.com/users";
+
+async function listaPerfis() {
   const result = await fetch(gitHub);
   const response = await result.json();
   return response;
@@ -46,7 +47,7 @@ async function consultaData() {
 }
 
 async function findById(idLogin) {
-  const apiUserId = `https://api.github.com/users/${idLogin}`;
+  const apiUserId = `${gitHub}/${idLogin}`;
   const result = await fetch(apiUserId);
   const user = await result.json();
   if (!user) {
