@@ -1,7 +1,8 @@
 const gitHub = "https://api.github.com/users";
 
-async function listaPerfis() {
-  const result = await fetch(gitHub);
+async function listaPerfis(page = 1, per_page = 5) {
+  const queryPaginada = `?page=${page}&per_page=${per_page}`;
+  const result = await fetch(gitHub + queryPaginada);
   const response = await result.json();
   return response;
 }
@@ -83,7 +84,9 @@ async function findById(idLogin) {
 }
 
 async function pesquisa() {
-  const userFiltered = document.getElementById("search-user").value.toLowerCase();
+  const userFiltered = document
+    .getElementById("search-user")
+    .value.toLowerCase();
   if (userFiltered) {
     const resultFilter = `${gitHub}/${userFiltered}`;
     const userFilter = await fetch(resultFilter);
@@ -92,10 +95,4 @@ async function pesquisa() {
     return;
   }
   consultaData();
-}
-
-function formatDate(date) {
-  let dateformated = new Date(date);
-  dateformated = dateformated.toLocaleDateString();
-  return dateformated;
 }
