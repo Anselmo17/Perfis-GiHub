@@ -51,14 +51,19 @@ async function findById(idLogin) {
   const resultUser = `${gitHub}/${idLogin}`;
   const result = await fetch(resultUser);
   const user = await result.json();
+  let userModal = "";
   if (!user) {
-    alert("Nenhum usuario encontrado");
+      userModal += `
+        <div>
+          <div class="alignClose">
+            <a href="/" title="Close" class="close">X</a>
+          </div>
+          <h5>Nenhum usuario encontrado</h5>
+        </div>
+        `;
+      chamaModal(userModal);
     return;
   }
-
-  const openModal = document.getElementById("openModal");
-
-  let userModal = "";
   userModal += `
    <div>
     <div class="alignClose">
@@ -75,12 +80,7 @@ async function findById(idLogin) {
    `;
 
   // carrega template modal
-  openModal.innerHTML = userModal;
-
-  // abrir modal
-  openModal.style.display = "block";
-  let urlBase = window.location.href.replace("#openModal", "");
-  window.location.href = urlBase + "#openModal";
+  chamaModal(userModal);
 }
 
 async function pesquisa() {
@@ -88,11 +88,34 @@ async function pesquisa() {
     .getElementById("search-user")
     .value.toLowerCase();
   if (userFiltered) {
-    const resultFilter = `${gitHub}/${userFiltered}`;
-    const userFilter = await fetch(resultFilter);
-    const resFilter = await userFilter.json();
-    consultaData(resFilter);
-    return;
+    try {
+      const resultFilter = `${gitHub}/${userFiltered.replaceAll(" ", "")}`;
+      const userFilter = await fetch(resultFilter);
+      const resFilter = await userFilter.json();
+      if (resFilter.message === "Not Found") {
+        throw new Error("Usuario nao encontrado");
+        return;
+      }
+      consultaData(resFilter);
+      return;
+    } catch (error) {
+      let userModal = "";
+      userModal += `
+        <div>
+          <div class="alignClose">
+            <a href="/" title="Close" class="close">X</a>
+          </div>
+          <h5>Nenhum usuario encontrado</h5>
+        </div>
+        `;
+      chamaModal(userModal);
+      consultaData();
+      limparPesquisa();
+    }
   }
   consultaData();
+}
+
+function limparPesquisa() {
+  document.getElementById("search-user").value = "";
 }
